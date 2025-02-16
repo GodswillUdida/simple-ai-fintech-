@@ -6,6 +6,7 @@ import helmet from 'helmet';
 import dotenv from 'dotenv';
 // import brain from 'brain.js';
 import * as brain from 'brain.js';
+import routing from "../router/userRouter";
 
 
 dotenv.config();
@@ -16,9 +17,17 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 app.use(helmet());
+app.use("/api",routing);
 
 app.get('/', (req: Request, res: Response) => {
- return res.send('Welcome to the AI-powered Fintech Platform');
+ try {
+  return res.status(200).json("Welcome to the AI-powered Fintech Platform");
+ } catch (error:any) {
+  return res.status(200).json({
+    message: "Error Accessing the Fintech Platform",
+    error: error.message,
+  });
+ }
 });
 
 const net = new brain.NeuralNetwork();
@@ -29,15 +38,24 @@ net.train([
   { input: [0, 1], output: [1] },
   { input: [1, 0], output: [1] },
   { input: [1, 1], output: [0] },
+  { input: [0.5, 0.5], output: [0.5] },
+  { input: [0.2, 0.8], output: [0.8] },
+  { input: [0.8, 0.2], output: [0.8] },
 ]);
 
 app.post('/predict', (req: Request, res: Response) => {
   const { input } = req.body;
   const output = net.run(input);
-  res.json({ output });
+  return res.json({ output });
+});
+
+app.use((err: any, req: Request, res: Response, next: any) => {
+  console.error(err.stack);
+  return res.status(500).json({ message: 'Something went wrong!' });
 });
 
 app.listen(port, () => {
   console.log()
+  // database
   console.log(`Server is running on port ${port}`);
 });
