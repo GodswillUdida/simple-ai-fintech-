@@ -91,6 +91,7 @@ Request Body:
 {
   "input": [number, number]
 }
+
 Response: 200 OK
 
 {
