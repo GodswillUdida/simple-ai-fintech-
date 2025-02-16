@@ -63,6 +63,7 @@ Request Body:
   "password": "string",
   "email": "string"
 }
+
 Response: 201 Created
 {
   "message": "User registered successfully"
