@@ -4,7 +4,9 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import dotenv from 'dotenv';
-import brain from 'brain.js';
+// import brain from 'brain.js';
+import * as brain from 'brain.js';
+
 
 dotenv.config();
 
@@ -16,7 +18,7 @@ app.use(bodyParser.json());
 app.use(helmet());
 
 app.get('/', (req: Request, res: Response) => {
-  res.send('Welcome to the AI-powered Fintech Platform');
+ return res.send('Welcome to the AI-powered Fintech Platform');
 });
 
 const net = new brain.NeuralNetwork();
@@ -36,5 +38,6 @@ app.post('/predict', (req: Request, res: Response) => {
 });
 
 app.listen(port, () => {
+  console.log()
   console.log(`Server is running on port ${port}`);
 });
