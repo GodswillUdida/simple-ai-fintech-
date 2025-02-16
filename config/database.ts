@@ -4,10 +4,7 @@ dotenv.config();
 
 export const dataBase = async() => {
   try {
-   await connect(process.env.MONGO_URI || "mongodb://localhost:27017/fintech",{
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-})
+   await connect(process.env.MONGO_URI || "mongodb://localhost:27017/fintech")
      .then(() => {
        console.log("Connected to MongoDB");
      })
@@ -18,8 +15,3 @@ export const dataBase = async() => {
     console.log(`Error conecting to database: ${error.message}`);
   }
 };
-
-//  {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// }
