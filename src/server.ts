@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 // import brain from 'brain.js';
 import * as brain from 'brain.js';
 import routing from "../router/userRouter";
+import { dataBase } from '../config/database';
 
 
 dotenv.config();
@@ -54,8 +55,18 @@ app.use((err: any, req: Request, res: Response, next: any) => {
   return res.status(500).json({ message: 'Something went wrong!' });
 });
 
-app.listen(port, () => {
+const liveServer = app.listen(port, () => {
   console.log()
-  // database
+  dataBase();
   console.log(`Server is running on port ${port}`);
+});
+
+process.on("uncaughtException", (error: Error) => {
+  console.log("Error due to uncaughtException", error.message);
+});
+
+process.on("unhandledRejection", (reason: any) => {
+  liveServer.close(() => {
+    console.log("Error due to unhandledRejection", reason.message);
+  });
 });
