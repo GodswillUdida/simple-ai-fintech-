@@ -27,7 +27,27 @@ This project is an AI-powered fintech platform designed to help MSMEs access fin
 ## Environment Variables
 
 Create a `.env` file at the root of your project and add the following variables:
-PORT=3000 MONGO_URI=mongodb://localhost:27017/fintech JWT_SECRET=your_jwt_secret
+GitHub Copilot
+To ensure that only signed-in users can use the AI functionalities, you need to implement authentication middleware that verifies the JWT token before allowing access to the AI endpoint.
+
+Here are the steps to achieve this:
+
+Create Authentication Middleware: This middleware will verify the JWT token.
+Protect the AI Endpoint: Use the authentication middleware to protect the /predict endpoint.
+1. Create Authentication Middleware
+Create a new file authMiddleware.ts in the middleware directory:
+
+2. Protect the AI Endpoint
+Update server.ts to use the authentication middleware for the /predict endpoint:
+
+3. Update userController.ts to Include User ID in Request
+Update userController.ts to include the user ID in the request object:
+
+1 vulnerability
+4. Update README.md to Reflect Changes
+Update the documentation to include instructions on how to use the AI functionalities with authentication.
+
+PORT=3000 MONGO_URI=mongodb://localhost:27017/fintech JWT_SECRET=your_jwt_secret SALT_ROUNDS=10
 
 
 ## Project Structure
@@ -85,7 +105,15 @@ Request Body:
 }
 
 ## POST /predict
-Description: Get financial predictions.
+Description: Get financial predictions. Only accessible to authenticated users.
+
+Request Headers:
+
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+
 Request Body:
 
 {
@@ -114,6 +142,34 @@ Database Connection: Ensure a stable connection to the MongoDB database using Mo
 
 ## Author
 This project was created by Udida Godswill.
+
+Using the AI Model
+POST /predict
+Description: Get financial predictions using the AI model. Only accessible to authenticated users.
+Request Headers:
+{
+  "Authorization": "Bearer jwt_token"
+}
+
+Request Body:
+{
+  "input": [number, number]
+}
+
+Response: 200 OK
+{
+  "output": [number]
+}
+
+Example Usage
+To use the AI model, first authenticate by logging in to get a JWT token. Then, send a POST request to /predict with the input data and the JWT token in the Authorization header. For example:
+curl -X POST http://localhost:3000/predict -H "Authorization: Bearer jwt_token" -H "Content-Type: application/json" -d '{"input": [0.5, 0.5]}'
+
+The response will contain the predicted output based on the input data.
+
+This setup ensures that only authenticated users can access the AI functionalities.
+
+
 
 
 
