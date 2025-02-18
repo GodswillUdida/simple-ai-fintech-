@@ -1,10 +1,13 @@
 import { Router } from "express";
-import { signIn, signUp } from "../controller/userController";
+import { getUser, signIn, signUp } from "../controller/userController";
+import { signInSchema, signUpSchema } from "../Validation/validate";
+import { validateSchema } from "../middleware/validateMiddleware";
 
 
 const router = Router();
 
-router.route("/signup").post(signUp);
-router.route("/signin").post(signIn);
+router.post("/signup", validateSchema(signUpSchema), signUp);
+router.post("/signin", validateSchema(signInSchema), signIn);
+router.get("/:id/get-user", getUser);
 
 export default router;
