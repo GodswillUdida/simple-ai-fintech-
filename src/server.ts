@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import * as brain from 'brain.js';
 import routing from "../router/userRouter";
 import { dataBase } from '../config/database';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 
 dotenv.config();
@@ -43,7 +44,7 @@ net.train([
   { input: [0.8, 0.2], output: [0.8] },
 ]);
 
-app.post('/predict', (req: Request, res: Response) => {
+app.post('/predict', authMiddleware, (req: Request, res: Response) => {
   const { input } = req.body;
   const output = net.run(input);
   return res.json({ output });
@@ -57,7 +58,6 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 const liveServer = app.listen(port, () => {
   console.log()
   dataBase();
-  // console.log(`Server is running on port ${port}`);
 });
 
 process.on("uncaughtException", (error: Error) => {
