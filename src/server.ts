@@ -31,9 +31,8 @@ app.get('/', (req: Request, res: Response) => {
  }
 });
 
-const net = new brain.NeuralNetwork();
+const net= new brain.NeuralNetwork();
 
-// Train the network with some data
 net.train([
   { input: [0, 0], output: [0] },
   { input: [0, 1], output: [1] },
@@ -58,15 +57,15 @@ app.use((err: any, req: Request, res: Response, next: any) => {
 const liveServer = app.listen(port, () => {
   console.log()
   dataBase();
-  console.log(`Server is running on port ${port}`);
+  // console.log(`Server is running on port ${port}`);
 });
 
 process.on("uncaughtException", (error: Error) => {
-  console.log("Error due to uncaughtException", error.message);
+  console.log("Error due to uncaughtException:", error.message);
 });
 
 process.on("unhandledRejection", (reason: any) => {
   liveServer.close(() => {
-    console.log("Error due to unhandledRejection", reason.message);
+    console.log("Error due to unhandledRejection:", reason.message);
   });
 });

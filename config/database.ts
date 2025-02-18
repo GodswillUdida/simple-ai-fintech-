@@ -4,7 +4,7 @@ dotenv.config();
 
 export const dataBase = async () => {
   try {
-    await connect(process.env.MONGO_URI || "mongodb://localhost:27017/fintech")
+    await connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/fintech")
       .then(() => {
         console.log("Connected to MongoDB");
       })
