@@ -47,7 +47,8 @@ Update userController.ts to include the user ID in the request object:
 4. Update README.md to Reflect Changes
 Update the documentation to include instructions on how to use the AI functionalities with authentication.
 
-PORT=3000 MONGO_URI=mongodb://localhost:27017/fintech JWT_SECRET=your_jwt_secret SALT_ROUNDS=10
+PORT=3000 MONGO_URI=mongodb://localhost:27017/fintech 
+JWT_SECRET=your_jwt_secret SALT_ROUNDS=10
 
 
 ## Project Structure

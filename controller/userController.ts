@@ -3,6 +3,7 @@ import { Request, Response } from "express";
 import { sign } from "jsonwebtoken";
 import User from "../model/userModel";
 import dotenv from "dotenv";
+import { generateToken } from "../config/jwtHelper";
 dotenv.config();
 
 export const signUp = async (req: Request, res: Response) => {
@@ -55,9 +56,11 @@ export const signIn = async (req: Request, res: Response) => {
       throw new Error("JWT_SECRET is not defined in environment variables.");
     }
 
-    const token = sign({ userId: user._id }, process.env.JWT_SECRET!, {
-      expiresIn: "1h",
-    });
+    // const token = sign({ userId: user._id }, process.env.JWT_SECRET!, {
+    //   expiresIn: "1h",
+    // });
+
+    const token = generateToken(user._id);
 
     res.json({ token });
   } catch (error: any) {
