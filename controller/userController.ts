@@ -1,12 +1,15 @@
 // import { compare } from "bcrypt";
-import { hash, verify } from "argon2";
 import { Request, Response } from "express";
 import User from "../model/userModel";
 import dotenv from "dotenv";
 import { generateRefreshToken, generateToken } from "../config/jwtHelper";
 dotenv.config();
+import { hash, verify } from "argon2";
 
-export const signUp = async (req: Request, res: Response) => {
+export const signUp = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const { username, password, email } = req.body;
 
@@ -15,12 +18,8 @@ export const signUp = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Email is already registered" });
     }
 
-    // const hashedPassword = await hash(
-    //   password,
-    //   parseInt(process.env.SALT_ROUNDS!)
-    // );
-
     const hashedPassword = await hash(password);
+    console.log("Hashed Password:", hashedPassword);
 
     const user = new User({ username, password: hashedPassword, email });
     await user.save();
@@ -41,17 +40,25 @@ export const signUp = async (req: Request, res: Response) => {
   }
 };
 
-export const signIn = async (req: Request, res: Response) => {
+export const signIn = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const { email, password } = req.body;
+
     const user: any = await User.findOne({ email });
+    console.log("user", user);
     if (!user) {
       return res.status(400).json({ message: "Invalid email" });
     }
 
-    // const isPasswordValid = await compare(password, user.password);
+    console.log("Stored Hashed Password:", user.password);
+    console.log("Entered Password:", password);
 
     const isPasswordValid = await verify(user.password, password);
+    console.log("Password Match:", isPasswordValid);
+
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Incorrect password" });
     }
@@ -81,15 +88,18 @@ export const signIn = async (req: Request, res: Response) => {
   }
 };
 
-export const getUser = async (req: Request, res: Response) => {
+export const getUser = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   try {
     const { id } = req.params;
-    const user: any = await User.findById(id);
+    const user = await User.findById(id).select("_id username email").lean();
 
     const secureUser = {
-      id: user._id,
-      username: user.username,
-      email: user.email,
+      id: user?._id,
+      username: user?.username,
+      email: user?.email,
     };
 
     if (!user) {
@@ -97,6 +107,34 @@ export const getUser = async (req: Request, res: Response) => {
     }
 
     return res.json({ data: secureUser });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ message: `Something went wrong: ${error.message}` });
+  }
+};
+
+export const getAllUsers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const users = await User.find().select("_id username email").lean();
+    return res.json({ data: users });
+  } catch (error: any) {
+    return res
+      .status(500)
+      .json({ message: `Something went wrong: ${error.message}` });
+  }
+};
+
+export const deleteAllUsers = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    await User.deleteMany();
+    return res.json({ message: "All users deleted successfully" });
   } catch (error: any) {
     return res
       .status(500)

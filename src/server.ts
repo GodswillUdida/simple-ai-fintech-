@@ -19,13 +19,6 @@ const port: string | number = process.env.PORT!;
 const realPort = parseInt(port);
 
 
-
-export const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, 
-  max: 5,
-  message: "Too many login attempts. Please try again later.",
-});
-
 app.use(
   cors({
     // origin: process.env.CLIENT_URL,
