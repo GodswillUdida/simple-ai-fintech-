@@ -9,6 +9,7 @@ import * as brain from 'brain.js';
 import routing from "../router/userRouter";
 import { dataBase } from '../config/database';
 import { authMiddleware } from '../middleware/authMiddleware';
+import rateLimit from 'express-rate-limit';
 
 
 dotenv.config();
@@ -16,6 +17,14 @@ dotenv.config();
 const app = express();
 const port: string | number = process.env.PORT!;
 const realPort = parseInt(port);
+
+
+
+export const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 5,
+  message: "Too many login attempts. Please try again later.",
+});
 
 app.use(
   cors({
