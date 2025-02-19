@@ -9,8 +9,8 @@ const router = Router();
 
 router.post("/signup", validateSchema(signUpSchema), signUp);
 router.post("/signin", loginLimiter,validateSchema(signInSchema), signIn);
-router.route("/:id/get-user").get(getUser);
-router.route("/delete-all").delete(deleteAllUsers);
-router.route("/get-all").get(getAllUsers);
+router.get("/:id/get-user", getUser);
+router.delete("/delete-all",deleteAllUsers);
+router.get("/get-all", getAllUsers);
 
 export default router;
