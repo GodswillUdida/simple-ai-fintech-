@@ -1,9 +1,9 @@
-import { compare, hash } from "bcrypt";
+// import { compare } from "bcrypt";
+import { hash, verify } from "argon2";
 import { Request, Response } from "express";
-import { sign } from "jsonwebtoken";
 import User from "../model/userModel";
 import dotenv from "dotenv";
-import { generateToken } from "../config/jwtHelper";
+import { generateRefreshToken, generateToken } from "../config/jwtHelper";
 dotenv.config();
 
 export const signUp = async (req: Request, res: Response) => {
@@ -15,10 +15,12 @@ export const signUp = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Email is already registered" });
     }
 
-    const hashedPassword = await hash(
-      password,
-      parseInt(process.env.SALT_ROUNDS!)
-    );
+    // const hashedPassword = await hash(
+    //   password,
+    //   parseInt(process.env.SALT_ROUNDS!)
+    // );
+
+    const hashedPassword = await hash(password);
 
     const user = new User({ username, password: hashedPassword, email });
     await user.save();
@@ -27,7 +29,7 @@ export const signUp = async (req: Request, res: Response) => {
       id: user._id,
       username: user.username,
       email: user.email,
-    }; 
+    };
 
     return res
       .status(201)
@@ -47,7 +49,9 @@ export const signIn = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid email" });
     }
 
-    const isPasswordValid = await compare(password, user.password);
+    // const isPasswordValid = await compare(password, user.password);
+
+    const isPasswordValid = await verify(user.password, password);
     if (!isPasswordValid) {
       return res.status(400).json({ message: "Incorrect password" });
     }
@@ -56,13 +60,20 @@ export const signIn = async (req: Request, res: Response) => {
       throw new Error("JWT_SECRET is not defined in environment variables.");
     }
 
-    // const token = sign({ userId: user._id }, process.env.JWT_SECRET!, {
-    //   expiresIn: "1h",
-    // });
-
     const token = generateToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
 
-    res.json({ token });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+    });
+
+    return res.json({
+      message: "User signed in successfully",
+      userData: { username: user.username, email: user.email },
+      token: token,
+    });
   } catch (error: any) {
     return res
       .status(500)

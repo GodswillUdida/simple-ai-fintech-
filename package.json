@@ -17,6 +17,7 @@
     "@types/express": "^4.17.13",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/mongoose": "^5.11.96",
+    "argon2": "^0.41.1",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.19.0",
     "brain.js": "^2.0.0-beta.2",
@@ -29,6 +30,7 @@
     "mongoose": "^8.10.1"
   },
   "devDependencies": {
+    "@types/argon2": "^0.14.1",
     "@types/cors": "^2.8.17",
     "@types/node": "^22.13.4",
     "ts-node": "^10.9.2",

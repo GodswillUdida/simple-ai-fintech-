@@ -14,9 +14,16 @@ import { authMiddleware } from '../middleware/authMiddleware';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port: string | number = process.env.PORT!;
+const realPort = parseInt(port);
 
-app.use(cors());
+app.use(
+  cors({
+    // origin: process.env.CLIENT_URL,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  })
+);
 app.use(bodyParser.json());
 app.use(helmet());
 app.use("/api",routing);
@@ -55,8 +62,8 @@ app.use((err: any, req: Request, res: Response, next: any) => {
   return res.status(500).json({ message: 'Something went wrong!' });
 });
 
-const liveServer = app.listen(port, () => {
-  console.log()
+const liveServer = app.listen(realPort, () => {
+  console.log();
   dataBase();
 });
 
