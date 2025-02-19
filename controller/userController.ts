@@ -1,10 +1,12 @@
 // import { compare } from "bcrypt";
 import { Request, Response } from "express";
-import User from "../model/userModel";
+import User, { IUser } from "../model/userModel";
 import dotenv from "dotenv";
 import { generateRefreshToken, generateToken } from "../config/jwtHelper";
 dotenv.config();
 import { hash, verify } from "argon2";
+import { errorResponse, successResponse } from "../config/responseHelper";
+import { Types } from "mongoose";
 
 export const signUp = async (
   req: Request,
@@ -30,13 +32,9 @@ export const signUp = async (
       email: user.email,
     };
 
-    return res
-      .status(201)
-      .json({ message: "User registered successfully", data: secureUser });
+    return successResponse(res, secureUser, "User Signed In successfully");
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ message: `Something went wrong: ${error.message}` });
+    return errorResponse(res, error.message, 500, error);
   }
 };
 
@@ -48,19 +46,15 @@ export const signIn = async (
     const { email, password } = req.body;
 
     const user: any = await User.findOne({ email });
-    console.log("user", user);
+
     if (!user) {
-      return res.status(400).json({ message: "Invalid email" });
+      return errorResponse(res, "Invalid Email", 404);
     }
 
-    console.log("Stored Hashed Password:", user.password);
-    console.log("Entered Password:", password);
-
     const isPasswordValid = await verify(user.password, password);
-    console.log("Password Match:", isPasswordValid);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Incorrect password" });
+      return errorResponse(res, "Incorrect Password", 404);
     }
 
     if (!process.env.JWT_SECRET) {
@@ -76,15 +70,13 @@ export const signIn = async (
       sameSite: "strict",
     });
 
-    return res.json({
-      message: "User signed in successfully",
-      userData: { username: user.username, email: user.email },
-      token: token,
-    });
+    return successResponse(
+      res,
+      { id: user._id, userName: user.username, email: user.email, token },
+      "User Signed In successfully"
+    );
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ message: `Something went wrong: ${error.message}` });
+    return errorResponse(res, error.message, 500, error);
   }
 };
 
@@ -94,23 +86,15 @@ export const getUser = async (
 ): Promise<Response> => {
   try {
     const { id } = req.params;
-    const user = await User.findById(id).select("_id username email").lean();
-
-    const secureUser = {
-      id: user?._id,
-      username: user?.username,
-      email: user?.email,
-    };
+    const user = await User.findById(id).select("-password").lean();
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return errorResponse(res, "User not found", 404);
     }
 
-    return res.json({ data: secureUser });
+    return successResponse(res, user, "User retrieved successfully");
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ message: `Something went wrong: ${error.message}` });
+    return errorResponse(res, error.message, 500, error);
   }
 };
 
@@ -120,11 +104,9 @@ export const getAllUsers = async (
 ): Promise<Response> => {
   try {
     const users = await User.find().select("_id username email").lean();
-    return res.json({ data: users });
+    return successResponse(res, users, "User retrieved successfully");
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ message: `Something went wrong: ${error.message}` });
+    return errorResponse(res, error.message, 500, error);
   }
 };
 
@@ -136,8 +118,6 @@ export const deleteAllUsers = async (
     await User.deleteMany();
     return res.json({ message: "All users deleted successfully" });
   } catch (error: any) {
-    return res
-      .status(500)
-      .json({ message: `Something went wrong: ${error.message}` });
+    return errorResponse(res, error.message, 500, error);
   }
 };

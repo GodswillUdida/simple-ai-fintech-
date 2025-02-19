@@ -1,6 +1,5 @@
 import { model, Schema } from "mongoose";
-import argon2 from "argon2";
-
+// import argon2 from "argon2";
 
 export interface IUser extends Document {
   username: string;

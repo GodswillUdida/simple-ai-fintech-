@@ -1,11 +1,27 @@
-export const successResponse = (res, data, message = "Success") => {
-  return res.status(200).json({ status: "success", message, data });
+import { Response } from "express";
+
+export const successResponse = <T>(
+  res: Response,
+  data: T,
+  message = "Success",
+  statusCode = 200
+) => {
+  return res.status(statusCode).json({
+    status: "success",
+    message,
+    data,
+  });
 };
 
 export const errorResponse = (
-  res,
+  res: Response,
   message = "Something went wrong",
-  code = 500
+  statusCode = 500,
+  errors?: any
 ) => {
-  return res.status(code).json({ status: "error", message });
+  return res.status(statusCode).json({
+    status: "error",
+    message,
+    errors: errors ?? null,
+  });
 };
