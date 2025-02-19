@@ -1,12 +1,10 @@
-// import { compare } from "bcrypt";
 import { Request, Response } from "express";
-import User, { IUser } from "../model/userModel";
+import User from "../model/userModel";
 import dotenv from "dotenv";
 import { generateRefreshToken, generateToken } from "../config/jwtHelper";
 dotenv.config();
 import { hash, verify } from "argon2";
 import { errorResponse, successResponse } from "../config/responseHelper";
-import { Types } from "mongoose";
 
 export const signUp = async (
   req: Request,
@@ -21,7 +19,6 @@ export const signUp = async (
     }
 
     const hashedPassword = await hash(password);
-    console.log("Hashed Password:", hashedPassword);
 
     const user = new User({ username, password: hashedPassword, email });
     await user.save();
@@ -116,7 +113,7 @@ export const deleteAllUsers = async (
 ): Promise<Response> => {
   try {
     await User.deleteMany();
-    return res.json({ message: "All users deleted successfully" });
+    return successResponse(res, "All User Deleted successfully");
   } catch (error: any) {
     return errorResponse(res, error.message, 500, error);
   }
