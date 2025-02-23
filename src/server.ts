@@ -9,12 +9,14 @@ import { dataBase } from "../config/database";
 import { authMiddleware } from "../middleware/authMiddleware";
 import dotenv from "dotenv";
 import { errorResponse, successResponse } from "../config/responseHelper";
+import morgan from "morgan";
 dotenv.config();
 
 const app = express();
 const port: string | number = process.env.PORT!;
 const realPort = parseInt(port);
 
+app.use(morgan("combined"));
 app.use(
   cors({
     // origin: process.env.CLIENT_URL,
@@ -75,3 +77,4 @@ process.on("unhandledRejection", (reason: any) => {
     console.log("Error due to unhandledRejection:", reason.message);
   });
 });
+
