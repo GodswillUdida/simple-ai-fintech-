@@ -8,7 +8,7 @@ import { deleteAllUsers, getAllUsers, getUser, signIn, signUp } from "../control
 const router = Router();
 
 router.post("/signup", validateSchema(signUpSchema), signUp);
-router.post("/signin", loginLimiter,validateSchema(signInSchema), signIn);
+router.post("/signin", loginLimiter, validateSchema(signInSchema), signIn);
 router.get("/:id/get-user", getUser);
 router.delete("/delete-all",deleteAllUsers);
 router.get("/get-all", getAllUsers);

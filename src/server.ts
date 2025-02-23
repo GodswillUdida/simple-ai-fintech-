@@ -1,23 +1,19 @@
 // src/server.ts
-import express, { Request, Response } from 'express';
-import bodyParser from 'body-parser';
-import cors from 'cors';
-import helmet from 'helmet';
-import dotenv from 'dotenv';
-// import brain from 'brain.js';
-import * as brain from 'brain.js';
+import express, { Request, Response } from "express";
+import bodyParser from "body-parser";
+import cors from "cors";
+import helmet from "helmet";
+import * as brain from "brain.js";
 import routing from "../router/userRouter";
-import { dataBase } from '../config/database';
-import { authMiddleware } from '../middleware/authMiddleware';
-import rateLimit from 'express-rate-limit';
-
-
+import { dataBase } from "../config/database";
+import { authMiddleware } from "../middleware/authMiddleware";
+import dotenv from "dotenv";
+import { errorResponse, successResponse } from "../config/responseHelper";
 dotenv.config();
 
 const app = express();
 const port: string | number = process.env.PORT!;
 const realPort = parseInt(port);
-
 
 app.use(
   cors({
@@ -28,20 +24,20 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use(helmet());
-app.use("/api",routing);
+app.use("/api", routing);
 
-app.get('/', (req: Request, res: Response) => {
- try {
-  return res.status(200).json("Welcome to the AI-powered Fintech Platform");
- } catch (error:any) {
-  return res.status(200).json({
-    message: "Error Accessing the Fintech Platform",
-    error: error.message,
-  });
- }
+app.get("/", (req: Request, res: Response) => {
+  try {
+    return successResponse(
+      res,
+      "Welcome to the AI-powered Fintech Platform",
+    );
+  } catch (error: any) {
+    return errorResponse(res, "Error Accessing the Fintech Platform",500,error.message);
+  }
 });
 
-const net= new brain.NeuralNetwork();
+const net = new brain.NeuralNetwork();
 
 net.train([
   { input: [0, 0], output: [0] },
@@ -53,7 +49,7 @@ net.train([
   { input: [0.8, 0.2], output: [0.8] },
 ]);
 
-app.post('/predict', authMiddleware, (req: Request, res: Response) => {
+app.post("/predict", authMiddleware, (req: Request, res: Response) => {
   const { input } = req.body;
   const output = net.run(input);
   return res.json({ output });
@@ -61,7 +57,8 @@ app.post('/predict', authMiddleware, (req: Request, res: Response) => {
 
 app.use((err: any, req: Request, res: Response, next: any) => {
   console.error(err.stack);
-  return res.status(500).json({ message: 'Something went wrong!' });
+  next();
+  return errorResponse(res, "Something went wrong!", 500);
 });
 
 const liveServer = app.listen(realPort, () => {

@@ -15,7 +15,7 @@ export const signUp = async (
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Email is already registered" });
+      return errorResponse(res, "Email is already registered", 400,);
     }
 
     const hashedPassword = await hash(password);
@@ -29,7 +29,7 @@ export const signUp = async (
       email: user.email,
     };
 
-    return successResponse(res, secureUser, "User Signed In successfully");
+    return successResponse(res, secureUser, "User Account Created successfully");
   } catch (error: any) {
     return errorResponse(res, error.message, 500, error);
   }
@@ -101,7 +101,7 @@ export const getAllUsers = async (
 ): Promise<Response> => {
   try {
     const users = await User.find().select("_id username email").lean();
-    return successResponse(res, users, "User retrieved successfully");
+    return successResponse(res, users, "Users retrieved successfully");
   } catch (error: any) {
     return errorResponse(res, error.message, 500, error);
   }
