@@ -16,7 +16,7 @@ const app = express();
 const port: string | number = process.env.PORT!;
 const realPort = parseInt(port);
 
-app.use(morgan("combined"));
+app.use(morgan("dev"));
 app.use(
   cors({
     // origin: process.env.CLIENT_URL,
